@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>米家场景实验室 · 浏览器自测</title></head>
+<body>
+  <h1>浏览器自测</h1>
+  <ul id="out"></ul>
+  <script type="module">
+    import { runAll } from './cases.js';
+    const ul = document.getElementById('out');
+    const results = await runAll();
+    for (const r of results) {
+      const li = document.createElement('li');
+      li.textContent = (r.ok ? 'ok   ' : 'FAIL ') + r.name;
+      li.style.color = r.ok ? '#1f9d55' : '#b3261e';
+      if (!r.ok) li.textContent += '\n' + (r.error?.stack ?? r.error);
+      ul.appendChild(li);
+    }
+  </script>
+</body>
+</html>

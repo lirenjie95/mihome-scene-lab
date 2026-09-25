@@ -1,0 +1,11 @@
+{
+  "name": "mihome-scene-lab",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/run.js",
+    "fixture": "node scripts/make-fixture.mjs"
+  }
+}

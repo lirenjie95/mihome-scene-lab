@@ -1,0 +1,807 @@
+{
+  "version": 2,
+  "rules": [
+    {
+      "id": "1790303088195",
+      "cfg": {
+        "id": "1790303088195",
+        "userData": {
+          "name": "回家",
+          "transform": {
+            "x": -329.8775267660178,
+            "y": 194.91728026260662,
+            "scale": 0.4823611477143579,
+            "rotate": 0
+          },
+          "lastUpdateTime": 1700000000000,
+          "version": 0
+        },
+        "uiType": "test",
+        "enable": true
+      },
+      "nodes": [
+        {
+          "id": "yiDFb2asrZ",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:camera:0000A01C:chuangmi-039c01:2",
+            "pos": {
+              "x": 74,
+              "y": 399,
+              "width": 528,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 1
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": [
+              "yAKGdTbyO7.input"
+            ]
+          },
+          "props": {
+            "did": "1000000001",
+            "siid": 2,
+            "piid": 1,
+            "value": false
+          }
+        },
+        {
+          "id": "aVExTwjv1j",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:switch:0000A003:xiaomi-w2:2:0000C809",
+            "pos": {
+              "x": 996.7287125157983,
+              "y": 587.1695546776253,
+              "width": 528,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 0
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": [
+              "Du5pLGjsQ0.input"
+            ]
+          },
+          "props": {
+            "did": "1000000002",
+            "siid": 2,
+            "piid": 1,
+            "value": true
+          }
+        },
+        {
+          "id": "RIbzgN5ck0",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:switch:0000A003:xiaomi-w2:2:0000C809",
+            "pos": {
+              "x": 990.7965343868483,
+              "y": 762.1688094816463,
+              "width": 528,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 1
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "did": "1000000003",
+            "siid": 3,
+            "piid": 1,
+            "value": true
+          }
+        },
+        {
+          "id": "ypg60iHi4F",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:switch:0000A003:xiaomi-w2:2:0000C809",
+            "pos": {
+              "x": 996.7287125157982,
+              "y": 412.17029987360394,
+              "width": 528,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 1
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "did": "1000000003",
+            "siid": 2,
+            "piid": 1,
+            "value": true
+          }
+        },
+        {
+          "id": "wTAKaniDDP",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:gateway:0000A019:xiaomi-hub1:3",
+            "pos": {
+              "x": 987.8304453223733,
+              "y": 934.2019752211927,
+              "width": 684,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 0
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "did": "1000000004",
+            "siid": 4,
+            "aiid": 1,
+            "ins": [
+              {
+                "piid": 1,
+                "value": "关闭客厅窗帘"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rqus2Yticb",
+          "type": "deviceGet",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:miaomiaoce-t9:1",
+            "pos": {
+              "x": 998.3939795340699,
+              "y": 238.08999425479632,
+              "width": 700,
+              "height": 164
+            },
+            "name": "deviceGet",
+            "version": 0
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": [
+              "B02TwqB6gb.trigger"
+            ],
+            "output2": []
+          },
+          "props": {
+            "did": "blt.3.1fake000001",
+            "siid": 3,
+            "piid": 1001,
+            "dtype": "float",
+            "operator": ">",
+            "v1": 24
+          }
+        },
+        {
+          "id": "aUkB8gOma1",
+          "type": "deviceGet",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:miaomiaoce-t9:1",
+            "pos": {
+              "x": 705.1716434440875,
+              "y": -410.7228210183739,
+              "width": 700,
+              "height": 164
+            },
+            "name": "deviceGet",
+            "version": 0
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": [
+              "akwvRoZfdx.trigger"
+            ],
+            "output2": [
+              "B3tL2cxHWa.input"
+            ]
+          },
+          "props": {
+            "did": "blt.3.1fake000001",
+            "siid": 3,
+            "piid": 1001,
+            "dtype": "float",
+            "operator": ">",
+            "v1": 27
+          }
+        },
+        {
+          "id": "B3tL2cxHWa",
+          "type": "deviceGet",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:miaomiaoce-t9:1",
+            "pos": {
+              "x": 717.0013905687846,
+              "y": -124.83726550485108,
+              "width": 700,
+              "height": 164
+            },
+            "name": "deviceGet",
+            "version": 0
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": [
+              "BK7glULOld.trigger"
+            ],
+            "output2": []
+          },
+          "props": {
+            "did": "blt.3.1fake000001",
+            "siid": 3,
+            "piid": 1001,
+            "dtype": "float",
+            "operator": "<",
+            "v1": 19
+          }
+        },
+        {
+          "id": "Du5pLGjsQ0",
+          "type": "delay",
+          "cfg": {
+            "unit": "s",
+            "value": 30,
+            "pos": {
+              "x": 1657.4662869822373,
+              "y": 639.1695546776253,
+              "width": 288,
+              "height": 112
+            },
+            "name": "delay",
+            "version": 1
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": [
+              "amgwHF52dw.trigger"
+            ]
+          },
+          "props": {
+            "timeout": 30000
+          }
+        },
+        {
+          "id": "amgwHF52dw",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:switch:0000A003:xiaomi-w2:2:0000C809",
+            "pos": {
+              "x": 2004.4722026400327,
+              "y": 587.1695546776253,
+              "width": 528,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 0
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "did": "1000000002",
+            "siid": 2,
+            "piid": 1,
+            "value": false
+          }
+        },
+        {
+          "id": "B02TwqB6gb",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:outlet:0000A002:yutai-fsov7m:1:0000C816",
+            "pos": {
+              "x": 1838.8557428942631,
+              "y": 192.08999425479635,
+              "width": 528,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 1
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "did": "1000000005",
+            "siid": 2,
+            "piid": 1,
+            "value": true
+          }
+        },
+        {
+          "id": "BK7glULOld",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:speaker:0000A015:xiaomi-oh2p:1",
+            "pos": {
+              "x": 1560.8566854638716,
+              "y": -190.83726550485108,
+              "width": 684,
+              "height": 204
+            },
+            "name": "deviceOutput",
+            "version": 1
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": [
+              "gggHEI2VHJ.input1"
+            ]
+          },
+          "props": {
+            "did": "1000000006",
+            "siid": 7,
+            "aiid": 4,
+            "ins": [
+              {
+                "piid": 1,
+                "value": "打开客厅空调，制热模式，26度。"
+              },
+              {
+                "piid": 2,
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "akwvRoZfdx",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:speaker:0000A015:xiaomi-oh2p:1",
+            "pos": {
+              "x": 1545.08368929761,
+              "y": -619.7150202213628,
+              "width": 684,
+              "height": 204
+            },
+            "name": "deviceOutput",
+            "version": 1
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": [
+              "gggHEI2VHJ.input0"
+            ]
+          },
+          "props": {
+            "did": "1000000006",
+            "siid": 7,
+            "aiid": 4,
+            "ins": [
+              {
+                "piid": 1,
+                "value": "打开客厅空调，除湿模式，27度。"
+              },
+              {
+                "piid": 2,
+                "value": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "ddR85rdL72",
+          "type": "alarmClock",
+          "cfg": {
+            "happenType": "now",
+            "tempOffset": 0,
+            "pos": {
+              "x": -1061.4039271774056,
+              "y": 622.4084278718735,
+              "width": 512,
+              "height": 152
+            },
+            "name": "alarmClock",
+            "version": 0
+          },
+          "inputs": {},
+          "outputs": {
+            "output": [
+              "YFUfoxQKrp.input"
+            ]
+          },
+          "props": {
+            "type": "sunset",
+            "isSunset": false,
+            "offset": 0,
+            "latitude": 0,
+            "longitude": 0,
+            "filter": {}
+          }
+        },
+        {
+          "id": "YFUfoxQKrp",
+          "type": "varSetNumber",
+          "cfg": {
+            "pos": {
+              "x": -509.3490613581886,
+              "y": 640.1530485589197,
+              "width": 740,
+              "height": 112,
+              "exprHeight": 30
+            },
+            "name": "varSetNumber",
+            "version": 0
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "id": "VodjZRPVOyZ",
+            "scope": "R1790303088195",
+            "elements": [
+              {
+                "type": "const",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "id": "N9sa1BWPSa",
+          "type": "varSetNumber",
+          "cfg": {
+            "pos": {
+              "x": -501.46256327505665,
+              "y": 872.8047420113039,
+              "width": 740,
+              "height": 112,
+              "exprHeight": 30
+            },
+            "name": "varSetNumber",
+            "version": 1
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "id": "VodjZRPVOyZ",
+            "scope": "R1790303088195",
+            "elements": [
+              {
+                "type": "const",
+                "value": "0"
+              }
+            ]
+          }
+        },
+        {
+          "id": "lKklb6bUAM",
+          "type": "alarmClock",
+          "cfg": {
+            "happenType": "now",
+            "tempOffset": 0,
+            "pos": {
+              "x": -1065.3471762189704,
+              "y": 854.8047420113039,
+              "width": 512,
+              "height": 152
+            },
+            "name": "alarmClock",
+            "version": 1
+          },
+          "inputs": {},
+          "outputs": {
+            "output": [
+              "N9sa1BWPSa.input"
+            ]
+          },
+          "props": {
+            "type": "sunset",
+            "isSunset": true,
+            "offset": 0,
+            "latitude": 0,
+            "longitude": 0,
+            "filter": {}
+          }
+        },
+        {
+          "id": "yAKGdTbyO7",
+          "type": "varGet",
+          "cfg": {
+            "pos": {
+              "x": 275.3574979134116,
+              "y": 732.8194010357174,
+              "width": 532,
+              "height": 120
+            },
+            "name": "varGet",
+            "version": 0
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": [
+              "rqus2Yticb.input",
+              "wTAKaniDDP.trigger",
+              "RIbzgN5ck0.trigger",
+              "aVExTwjv1j.trigger",
+              "ypg60iHi4F.trigger"
+            ],
+            "output2": []
+          },
+          "props": {
+            "id": "VodjZRPVOyZ",
+            "scope": "R1790303088195",
+            "varType": "number",
+            "operator": "=",
+            "v1": 0
+          }
+        },
+        {
+          "id": "L8jptYslen",
+          "type": "deviceInput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:gateway:0000A019:xiaomi-hub1:3",
+            "pos": {
+              "x": -504.89147117131597,
+              "y": -119.73681989003525,
+              "width": 436,
+              "height": 204
+            },
+            "name": "deviceInput",
+            "version": 1
+          },
+          "inputs": {},
+          "outputs": {
+            "output": [
+              "yiDFb2asrZ.trigger",
+              "aUkB8gOma1.input",
+              "axUnna5t2o.input"
+            ]
+          },
+          "props": {
+            "did": "1000000004",
+            "siid": 4,
+            "eiid": 1,
+            "arguments": [
+              {
+                "dtype": "string",
+                "piid": 1,
+                "operator": "=",
+                "v1": "回家"
+              }
+            ]
+          }
+        },
+        {
+          "id": "gggHEI2VHJ",
+          "type": "signalOr",
+          "cfg": {
+            "pos": {
+              "x": 2396.8254822758267,
+              "y": -359.4605834780177,
+              "width": 160,
+              "height": 180
+            },
+            "name": "signalOr",
+            "version": 0
+          },
+          "inputs": {
+            "input0": null,
+            "input1": null
+          },
+          "outputs": {
+            "output": [
+              "qZfFVwHHKh.trigger"
+            ]
+          },
+          "props": {}
+        },
+        {
+          "id": "qZfFVwHHKh",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:window-opener:0000A043:linp-wd1lb:1:0000C825",
+            "pos": {
+              "x": 2688.8984479827327,
+              "y": -377.4605834780177,
+              "width": 528,
+              "height": 164
+            },
+            "name": "deviceOutput",
+            "version": 0
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "did": "1000000007",
+            "siid": 2,
+            "piid": 1,
+            "value": 2
+          }
+        },
+        {
+          "id": "axUnna5t2o",
+          "type": "delay",
+          "cfg": {
+            "unit": "s",
+            "value": 30,
+            "pos": {
+              "x": 2410.6268539213097,
+              "y": 50.637316844828376,
+              "width": 288,
+              "height": 112
+            },
+            "name": "delay",
+            "version": 1
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": [
+              "mjHd1WFSnV.trigger"
+            ]
+          },
+          "props": {
+            "timeout": 30000
+          }
+        },
+        {
+          "id": "mjHd1WFSnV",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:speaker:0000A015:xiaomi-oh2p:1",
+            "pos": {
+              "x": 2802.9801335571105,
+              "y": -21.362683155171624,
+              "width": 684,
+              "height": 204
+            },
+            "name": "deviceOutput",
+            "version": 0
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": [
+              "MBbbf4t7r7.input"
+            ]
+          },
+          "props": {
+            "did": "1000000006",
+            "siid": 7,
+            "aiid": 4,
+            "ins": [
+              {
+                "piid": 1,
+                "value": "使用AI回复，回复内容不超过四十个字。变换样式说欢迎主人回家，语气欢快一点。"
+              },
+              {
+                "piid": 2,
+                "value": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "MBbbf4t7r7",
+          "type": "delay",
+          "cfg": {
+            "unit": "s",
+            "value": 7,
+            "pos": {
+              "x": 2501.3215818773233,
+              "y": 356.23911756618014,
+              "width": 288,
+              "height": 112
+            },
+            "name": "delay",
+            "version": 1
+          },
+          "inputs": {
+            "input": null
+          },
+          "outputs": {
+            "output": [
+              "qdZkYjvnGr.trigger"
+            ]
+          },
+          "props": {
+            "timeout": 7000
+          }
+        },
+        {
+          "id": "qdZkYjvnGr",
+          "type": "deviceOutput",
+          "cfg": {
+            "urn": "urn:miot-spec-v2:device:speaker:0000A015:xiaomi-oh2p:1",
+            "pos": {
+              "x": 2856.2139956182496,
+              "y": 285.26063481799474,
+              "width": 684,
+              "height": 204
+            },
+            "name": "deviceOutput",
+            "version": 0
+          },
+          "inputs": {
+            "trigger": null
+          },
+          "outputs": {
+            "output": []
+          },
+          "props": {
+            "did": "1000000006",
+            "siid": 7,
+            "aiid": 4,
+            "ins": [
+              {
+                "piid": 1,
+                "value": "告诉我家里的温度和湿度。"
+              },
+              {
+                "piid": 2,
+                "value": false
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "R1790303088195": {
+      "VodjZRPVOyZ": {
+        "type": "number",
+        "value": 1,
+        "userData": {
+          "name": "时段"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+*.log
+# 设计/计划文档仅存本地,不进仓库
+docs/
+# 原始场景备份不入库(演示数据用脱敏版)
+*.bak
+!tests/fixtures/*.bak
