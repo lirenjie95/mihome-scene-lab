@@ -108,6 +108,15 @@ export class Engine {
     return last;
   }
 
+  setTimeRange(nodeId, inRange) {
+    this.memOf(nodeId, 'inRange', () => false);
+    this.mem.get(nodeId).set('inRange', Boolean(inRange));
+    this.logLine('state', nodeId, `时间窗${inRange ? '进入' : '离开'}`);
+    const node = this.byId.get(nodeId);
+    if (node) nodes.onState(this, node, { timeRange: true });
+    return this;
+  }
+
   onStateChanged(did, siid, piid) {
     for (const n of this.nodes) {
       if (['logicAnd', 'logicOr', 'logicNot', 'statusLast', 'varChange', 'timeRange', 'deviceInput'].includes(n.type)) {

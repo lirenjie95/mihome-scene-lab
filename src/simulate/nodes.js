@@ -354,6 +354,10 @@ export function onState(eng, node) {
       }
       return;
     }
+    case 'timeRange': {
+      stateOutput(eng, node, evalState(eng, node), '时间窗状态');
+      return;
+    }
     case 'varChange': {
       stateOutput(eng, node, evalState(eng, node), 'varChange 状态');
       return;

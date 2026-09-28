@@ -1,5 +1,6 @@
 import { buildMessages, buildSystemPrompt, extractJson, generateScene } from '../src/ai.js';
 import { normalizePayload } from '../src/model.js';
+import { validateRule } from '../src/simulate/validate.js';
 
 export const tests = [
   {
@@ -40,9 +41,22 @@ export const tests = [
     name: '系统提示词包含节点目录、canonical 键位与运算符',
     fn() {
       const p = buildSystemPrompt();
-      for (const need of ['deviceOutput', 'deviceInput', '六段', 'outputs', '运算符', 'alarmClock', 'dtype']) {
+      for (const need of ['deviceOutput', 'deviceInput', '六段', 'outputs', '运算符', 'alarmClock', 'dtype', 'between', 'include', 'float', '示例']) {
         if (!p.includes(need)) throw new Error(`提示词缺 ${need}`);
       }
+    },
+  },
+  {
+    name: '提示词内嵌示例可通过规范化与节点校验',
+    fn() {
+      const p = buildSystemPrompt();
+      const m = p.match(/\{"version":2,"rules":\[\{"id":"demo"[\s\S]*\}$/);
+      if (!m) throw new Error('提示词未找到内嵌示例 JSON');
+      const example = JSON.parse(m[0]);
+      const payload = normalizePayload(example);
+      if (payload.rules.length !== 1) throw new Error('示例应有 1 条规则');
+      const issues = validateRule(payload.rules[0]).filter((i) => i.level === 'error');
+      if (issues.length !== 0) throw new Error(`示例应有 0 error: ${JSON.stringify(issues)}`);
     },
   },
   {

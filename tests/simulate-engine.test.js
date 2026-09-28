@@ -42,4 +42,33 @@ export const tests = [
       if (eng.trace.length !== 1) throw new Error('注入应产生 trace 条目');
     },
   },
+  {
+    name: 'setTimeRange 进入时向动作下游发事件',
+    fn() {
+      const eng = new Engine({
+        nodes: [
+          { id: 'tr', type: 'timeRange', cfg: { pos: {} }, inputs: {}, outputs: { output: ['a.trigger'] }, props: { start: '00:00:00', end: '23:59:59' } },
+          { id: 'a', type: 'deviceOutput', cfg: { pos: {} }, inputs: { trigger: null }, outputs: {}, props: { did: 'd1', siid: 2, piid: 1, value: true } },
+        ],
+      });
+      eng.setTimeRange('tr', true);
+      if (eng.getDevice('d1', 2, 1) !== true) throw new Error('进入时间窗应触发动作');
+    },
+  },
+  {
+    name: 'setTimeRange 离开时只更新状态,不向动作下游发事件',
+    fn() {
+      const eng = new Engine({
+        nodes: [
+          { id: 'tr', type: 'timeRange', cfg: { pos: {} }, inputs: {}, outputs: { output: ['a.trigger'] }, props: { start: '00:00:00', end: '23:59:59' } },
+          { id: 'a', type: 'deviceOutput', cfg: { pos: {} }, inputs: { trigger: null }, outputs: {}, props: { did: 'd1', siid: 2, piid: 1, value: true } },
+        ],
+      });
+      eng.setTimeRange('tr', true);
+      eng.setTimeRange('tr', false);
+      if (!eng.log.some((l) => l.text.includes('离开'))) throw new Error('缺离开日志');
+      const actions = eng.log.filter((l) => l.kind === 'action').length;
+      if (actions !== 1) throw new Error(`动作应只执行一次: ${actions}`);
+    },
+  },
 ];
