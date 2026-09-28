@@ -11,10 +11,14 @@
 - 确定性脱敏:DID → 假 DID、经纬度 → 0,时间戳 → 固定值,可重新打包为 .bak 下载
 - 支持 version-2 载荷与旧版 rules-only 数组(新老两代极客版 .bak 均可打开)
 - **交互式逻辑模拟**:设置设备状态与场景变量 → 触发设备事件/定时/启用触发 → 按虚拟时钟逐步回放执行路径(延时、条件、计数器、顺序事件等),流程图高亮本次触发链路,附事件日志
-- **静态诊断**:无触发源、动作无通路(可能永不执行)、引脚类型错配、悬空边
-- **语义假设面板**:固件未经实机验证的行为(delay 重复触发、statusLast 复位时点、counter 边界等)以可切换假设呈现,并在日志中标注
+- **静态诊断**:无触发源、动作无通路(可能永不执行)、引脚类型错配、悬空边、nop 连边、可选控制引脚未连接提示
+- **节点级 canonical 校验**:dtype/运算符匹配(float 仅 `> < between`、int 枚举用 include、boolean/string 用 =)、between 缺 v2、include 数组、deviceOutput 字面量/变量二选一、时长与计数约束
+- **语义假设面板**:固件未经实机验证的行为(delay 重复触发、statusLast 复位时点、counter 边界、状态卡真值边沿等)以可切换假设呈现,并在日志中标注
 - **JSON 编辑/创建**:编辑场景 JSON 并实时预览(流程图/解读/诊断/模拟随之刷新);可从模板新建场景,或按节点类型插入 canonical 六段骨架;导出 .bak 后经极客版备份恢复导入网关
-- **AI 写场景**:自然语言描述需求 → 生成场景 JSON(OpenAI 兼容端点,支持 DeepSeek 等;提示词内置完整节点目录与格式规范);API Key 仅存本浏览器,只发送给你填写的端点
+- **AI 写场景**:自然语言描述需求 → 生成场景 JSON(OpenAI 兼容端点,支持 DeepSeek 等;提示词内置节点目录、运算符-数据类型词汇表与合规示例);API Key 仅存本浏览器,只发送给你填写的端点
+- **模拟器操作**:重置 / 单步 / 导出日志 / 时间窗进入离开切换 / 多场景选择器
+- **设备词典**:21 款常见型号(小爱音箱/家庭屏系列、摄像机、智能开关),未收录型号在设备清单页提供 PR 贡献入口
+- **深色模式**与 **PWA 离线可用**(访问一次后断网仍可打开)
 
 ## 支持范围
 
@@ -44,11 +48,25 @@ node scripts/make-fixture.mjs <你的.bak>  # 生成脱敏测试数据
 
 浏览器自测页:`tests/browser.html`。
 
+手工测试清单:
+
+1. 拖入演示数据 → 总览/设备/流程图/解读正常,流程图有箭头与引脚圆点
+2. 拖入改名 .bak 的普通文件 → 出现中文错误提示
+3. 编辑 JSON → 应用更改 → 预览与模拟随之刷新;插入节点骨架
+4. AI 生成(配置 API Key)→ 结果载入编辑页且诊断无 error
+5. 模拟:温湿度计设 28 → 触发「回家」→ 除湿动作;+30s → AI 回复
+6. 模拟:单步、重置、导出日志可用
+7. 编辑:把 delay 的 timeout 删掉 → 诊断报 error
+8. 脱敏导出 → 重新上传可解析、DID 已替换
+9. 深色模式切换并刷新保持
+10. 首次访问后断网刷新仍可打开(PWA 离线)
+
 ## 语义与免责声明
 
 节点执行语义依据 xgg 的 graph-model.md 整理;固件行为未经全面实机验证,标注"假设"处不代表真实网关行为。本工具是理解与调试辅助,不保证与网关执行结果完全一致。项目与小米公司无关。
 
 ## 致谢与参考
 
-- [eyaeya/xiaomi-central-hub-gateway-cli](https://github.com/eyaeya/xiaomi-central-hub-gateway-cli)(GPL-3.0):已获授权使用其文档内容。容器格式见其 `packages/core/src/crypto/deflate.ts` 与 `packages/core/src/usecases/local-backup.ts`;执行模型与 25 节点 canonical 契约(引脚表、props 键位、骨架)提炼自 `packages/cli/skills/xgg-rule-authoring/references/graph-model.md` 与 `node-catalog.md`,对应本项目 `src/catalog.js`。本项目实现为独立代码
+- [eyaeya/xiaomi-central-hub-gateway-cli](https://github.com/eyaeya/xiaomi-central-hub-gateway-cli)(GPL-3.0):已获授权使用其文档内容。容器格式见其 `packages/core/src/crypto/deflate.ts` 与 `packages/core/src/usecases/local-backup.ts`;执行模型与 25 节点 canonical 契约(引脚表、props 键位、骨架)提炼自 `packages/cli/skills/xgg-rule-authoring/references/graph-model.md` 与 `node-catalog.md`;运算符-数据类型词汇表来自 `references/device-semantics.md`,对应本项目 `src/catalog.js` 与 `src/simulate/validate.js`。本项目实现为独立代码
 - [home.miot-spec.com](https://home.miot-spec.com)、[mijia.wiki](https://mijia.wiki):设备型号 → 名称资料
+- [mi-gpt compatibility.md](https://github.com/idootop/mi-gpt/blob/main/docs/compatibility.md):小爱音箱系列型号与名称对照(各条目附 miot-spec 链接)
