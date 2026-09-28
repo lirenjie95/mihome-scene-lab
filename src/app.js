@@ -1,6 +1,6 @@
 import { decodeBackup, packBackup } from './parse.js';
 import { normalizePayload } from './model.js';
-import { deviceLabel, modelOf } from './devices.js';
+import { deviceLabel, modelOf, lookupDevice } from './devices.js';
 import { layoutGraph } from './layout.js';
 import { renderRuleSvg } from './render.js';
 import { describeRule } from './summary.js';
@@ -91,10 +91,12 @@ function renderAll(payload, opts = {}) {
       if (urn && did) deviceSet.set(did, { urn, label: deviceLabel(urn), model: modelOf(urn) });
     }
   }
+  const unknownCount = [...deviceSet.values()].filter((d) => !lookupDevice(d.urn)).length;
   $('devices').innerHTML = `
     <table><tr><th>设备</th><th>型号</th><th>DID</th></tr>
     ${[...deviceSet.entries()].map(([did, d]) => `<tr><td>${escapeHtml(d.label)}</td><td>${escapeHtml(d.model ?? '-')}</td><td>${escapeHtml(did)}</td></tr>`).join('')}
-    </table>`;
+    </table>
+    ${unknownCount > 0 ? `<p style="font-size:12px;color:var(--ink-3)">有 ${unknownCount} 个型号未收录?欢迎到 <a href="https://github.com/lirenjie95/mihome-scene-lab" target="_blank" rel="noopener">GitHub 仓库</a> 提交 PR 补充 src/devices.js 词典(附型号来源)。</p>` : ''}`;
 
   const graphs = payload.rules.map((r) => `<h3>${escapeHtml(r.cfg?.userData?.name ?? r.id ?? '未命名')}</h3>` + renderRuleSvg(r, layoutGraph(r)));
   $('graph').innerHTML = graphs.join('');

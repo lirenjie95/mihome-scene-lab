@@ -1,5 +1,5 @@
 import { escapeHtml } from '../src/escape.js';
-import { collectDeviceProps, deviceRowHtml } from '../src/simulate/ui.js';
+import { collectDeviceProps, deviceRowHtml, formatLog } from '../src/simulate/ui.js';
 
 const node = (id, type, props, outputs = {}) => ({
   id,
@@ -54,6 +54,17 @@ export const tests = [
     fn() {
       const html = deviceRowHtml({ key: 'd1:2:1', did: 'd1', siid: 2, piid: 1, value: true }, true);
       if (!html.includes('type="checkbox"') || !html.includes('checked')) throw new Error(`应为勾选的 checkbox: ${html}`);
+    },
+  },
+  {
+    name: 'formatLog 输出带时间戳的文本日志',
+    fn() {
+      const text = formatLog([
+        { t: 500, kind: 'action', nodeId: 'a1', text: '执行:开灯' },
+        { t: 30000, kind: 'event', nodeId: null, text: '触发' },
+      ]);
+      if (!text.includes('[0.5s] action a1 执行:开灯')) throw new Error(`首行错误: ${text}`);
+      if (!text.includes('[30.0s] event 触发')) throw new Error(`次行错误: ${text}`);
     },
   },
 ];

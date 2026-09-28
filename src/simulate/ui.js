@@ -36,6 +36,13 @@ export function deviceRowHtml(p, cur) {
   return `<tr><td>${did}</td><td>${sp}</td><td><input type="number" step="1" data-key="${key}" value="${v}"></td></tr>`;
 }
 
+// 纯函数:事件日志 → 文本(导出用)
+export function formatLog(log) {
+  return log
+    .map((l) => `[${(l.t / 1000).toFixed(1)}s] ${l.kind} ${l.nodeId ? `${l.nodeId} ` : ''}${l.text}`)
+    .join('\n');
+}
+
 export function setupSimUI(payload) {
   const sim = document.getElementById('sim');
   if (!sim) return;
@@ -114,7 +121,9 @@ export function setupSimUI(payload) {
           <div class="sim-panel"><h4>设备状态(改动即生效)</h4><table><tr><th>DID</th><th>属性</th><th>值</th></tr>${deviceRows}</table></div>
           <div class="sim-panel"><h4>场景变量</h4><table><tr><th>变量</th><th>值</th></tr>${varRows || '<tr><td colspan="2">无</td></tr>'}</table></div>
           <div class="sim-panel"><h4>虚拟时钟: <span id="sim-time">0.0s</span></h4>
-            <button data-adv="1000">+1s</button> <button data-adv="60000">+1m</button> <button data-adv="3600000">+1h</button></div>
+            <button data-adv="1000">+1s</button> <button data-adv="60000">+1m</button> <button data-adv="3600000">+1h</button>
+            <button data-step="1">单步</button> <button data-reset="1">重置</button> <button data-exportlog="1">导出日志</button>
+            <span id="sim-hint" style="font-size:12px;color:var(--ink-3)"></span></div>
           <div class="sim-panel"><h4>触发事件</h4>${triggerButtons}</div>
           <div class="sim-panel"><h4>静态诊断</h4>${diagHtml}</div>
           <div class="sim-panel"><h4>语义假设(可切换)</h4>${assumptionRows}</div>
@@ -191,6 +200,22 @@ export function setupSimUI(payload) {
         }
         if (firedIds.size) refreshSvg([...firedIds]);
         refreshTime();
+      } else if (t.dataset.step) {
+        const out = eng.step();
+        const hint = document.getElementById('sim-hint');
+        if (hint) {
+          hint.textContent = out ? `已执行事件 @${(out.t / 1000).toFixed(1)}s` : '没有待处理事件';
+        }
+        refreshTime();
+      } else if (t.dataset.reset) {
+        renderPanel(rule);
+      } else if (t.dataset.exportlog) {
+        const url = URL.createObjectURL(new Blob([formatLog(eng.log)], { type: 'text/plain' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'simulation-log.txt';
+        a.click();
+        URL.revokeObjectURL(url);
       }
     });
 

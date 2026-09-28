@@ -51,4 +51,21 @@ export const tests = [
       }
     },
   },
+  {
+    name: '词典已收录不少于 20 个型号',
+    fn() {
+      let count = 0;
+      for (const model of ['chuangmi-039c01', 'xiaomi-w2', 'xiaomi-oh2p', 'xiaomi-oh2', 'xiaomi-lx06', 'xiaomi-s12', 'xiaomi-l15a', 'xiaomi-lx5a', 'xiaomi-lx05', 'xiaomi-x10a', 'xiaomi-l17a', 'xiaomi-l06a', 'xiaomi-lx01', 'xiaomi-l05b', 'xiaomi-l05c', 'xiaomi-l09a', 'xiaomi-lx04', 'xiaomi-x4b', 'xiaomi-x6a', 'xiaomi-x08e', 'xiaomi-x8f']) {
+        if (lookupDevice(`urn:miot-spec-v2:device:speaker:0000A015:${model}:1`)) count += 1;
+      }
+      if (count < 20) throw new Error(`词典收录不足: ${count}`);
+    },
+  },
+  {
+    name: '小爱音箱 Pro 解析为中文名',
+    fn() {
+      const hit = lookupDevice('urn:miot-spec-v2:device:speaker:0000A015:xiaomi-lx06:1');
+      if (hit?.name !== '小爱音箱 Pro') throw new Error(`名称不符: ${JSON.stringify(hit)}`);
+    },
+  },
 ];
