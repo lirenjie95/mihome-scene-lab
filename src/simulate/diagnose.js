@@ -1,4 +1,5 @@
 import { pinType } from '../pins.js';
+import { validateRule } from './validate.js';
 
 const SOURCE_TYPES = new Set(['deviceInput', 'deviceInputSetVar', 'alarmClock', 'timeRange', 'onLoad', 'varChange']);
 const SINK_TYPES = new Set(['deviceOutput', 'deviceGetSetVar', 'varSetNumber', 'varSetString']);
@@ -10,12 +11,20 @@ function isEventInput(node, pin) {
   return EVENT_INPUTS.has(pin);
 }
 
+// 可选控制引脚:未连接时给 info 提示(不构成错误)
+const AUX_PINS = { loop: ['stop'], onlyNTimes: ['zero'], counter: ['zero'] };
+
 export function diagnoseRule(rule) {
   const issues = [];
   const nodes = rule.nodes ?? [];
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const sources = nodes.filter((n) => SOURCE_TYPES.has(n.type));
   const sinks = nodes.filter((n) => SINK_TYPES.has(n.type));
+
+  // 节点级 canonical 校验(validate.js)
+  for (const v of validateRule(rule)) {
+    issues.push({ level: v.level, text: v.text, nodeIds: [v.nodeId] });
+  }
 
   if (sources.length === 0) {
     issues.push({ level: 'error', text: '没有任何独立触发源(设备事件/定时/变量变化/启用触发),场景永远不会启动', nodeIds: [] });
@@ -43,6 +52,10 @@ export function diagnoseRule(rule) {
     const src = byId.get(e.from);
     const dst = byId.get(e.to);
     if (!src || !dst) continue;
+    if (src.type === 'nop') {
+      issues.push({ level: 'warn', text: `nop 是画布备注,禁止连边(${e.from}.${e.fromPin} → ${e.to})`, nodeIds: [e.from] });
+      continue;
+    }
     const t = pinType(src, e.fromPin);
     const dstIsEvent = isEventInput(dst, e.toPin);
     if (t === 'event' && !dstIsEvent) {
@@ -50,6 +63,16 @@ export function diagnoseRule(rule) {
     }
     if (t === 'state' && dstIsEvent && e.toPin !== 'condition') {
       issues.push({ level: 'warn', text: `${src.id}.${e.fromPin}(state)接到 ${dst.id}.${e.toPin}(event 输入),类型不匹配`, nodeIds: [src.id, dst.id] });
+    }
+  }
+
+  // 可选控制引脚未连接的 info 提示
+  const wired = new Set(edges.map((e) => `${e.to}.${e.toPin}`));
+  for (const n of nodes) {
+    for (const pin of AUX_PINS[n.type] ?? []) {
+      if (!wired.has(`${n.id}.${pin}`)) {
+        issues.push({ level: 'info', text: `${n.id}.${pin} 未连接:该控制引脚仅在需要中止/清零时使用`, nodeIds: [n.id] });
+      }
     }
   }
 
