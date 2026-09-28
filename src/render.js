@@ -19,16 +19,6 @@ function catOf(type) {
   return 'other';
 }
 
-function headColor(type) {
-  switch (catOf(type)) {
-    case 'src': return '#b26a00';
-    case 'query': return '#2f9c9c';
-    case 'logic': return '#7a5af8';
-    case 'sink': return '#c14b3d';
-    default: return '#8a919c';
-  }
-}
-
 const esc = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
 const trunc = (s, n) => {
@@ -86,7 +76,7 @@ export function renderRuleSvg(rule, layout) {
     const w = node.cfg?.pos?.width > 0 ? node.cfg.pos.width : 220;
     const h = node.cfg?.pos?.height > 0 ? node.cfg.pos.height : 110;
     const head = TYPE_CN[node.type] ?? node.type ?? '未知卡片';
-    const color = headColor(node.type);
+    const cat = catOf(node.type);
     const dev = node.cfg?.urn ? deviceLabel(node.cfg.urn) : null;
     const param = paramText(node);
 
@@ -102,7 +92,7 @@ export function renderRuleSvg(rule, layout) {
 
     parts.push(`<g class="node" data-id="${esc(id)}">
   <rect class="node-bg" x="${pos.x}" y="${pos.y}" width="${w}" height="${h}" rx="10"/>
-  <path class="node-head" d="M ${pos.x + 10} ${pos.y} H ${pos.x + w - 10} Q ${pos.x + w} ${pos.y} ${pos.x + w} ${pos.y + 10} V ${pos.y + HEAD_H} H ${pos.x} V ${pos.y + 10} Q ${pos.x} ${pos.y} ${pos.x + 10} ${pos.y} Z" fill="${color}"/>
+  <path class="node-head node-head-${cat}" d="M ${pos.x + 10} ${pos.y} H ${pos.x + w - 10} Q ${pos.x + w} ${pos.y} ${pos.x + w} ${pos.y + 10} V ${pos.y + HEAD_H} H ${pos.x} V ${pos.y + 10} Q ${pos.x} ${pos.y} ${pos.x + 10} ${pos.y} Z"/>
   <text class="node-head-text" x="${pos.x + w / 2}" y="${pos.y + 17}" text-anchor="middle">${esc(head)}</text>
   <text class="node-title" x="${pos.x + 12}" y="${pos.y + HEAD_H + 20}">${esc(trunc(dev ?? '', 22))}</text>
   <text class="node-sub" x="${pos.x + 12}" y="${pos.y + HEAD_H + 38}">${esc(trunc(param || node.type, 24))}</text>

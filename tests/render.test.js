@@ -54,4 +54,13 @@ export const tests = [
       if (!label.includes('延时') || !label.includes('30')) throw new Error(`标签: ${label}`);
     },
   },
+  {
+    name: '节点头部分类着色 class(供深色主题覆盖)',
+    fn() {
+      const svg = renderRuleSvg(rule, layoutGraph(rule));
+      if (!svg.includes('node-head-src')) throw new Error('触发源节点头部应带 node-head-src');
+      if (!svg.includes('node-head-sink')) throw new Error('动作节点头部应带 node-head-sink');
+      if (/<path class="node-head[^"]*"[^>]*fill=/.test(svg)) throw new Error('节点头部路径不应写死 fill 属性');
+    },
+  },
 ];

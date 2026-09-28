@@ -1,0 +1,19 @@
+{
+  "name": "米家场景实验室",
+  "short_name": "米家场景实验室",
+  "description": "米家自动化极客版场景(.bak)浏览器端实验室:解读、模拟、编辑与 AI 生成,纯本地处理。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6fb",
+  "theme_color": "#2563eb",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

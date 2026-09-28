@@ -4,6 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>米家场景实验室</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#2563eb">
+  <script>
+    // 主题初始化(尽早设置,避免闪烁);手动选择优先,否则跟随系统
+    (function () {
+      var t = localStorage.getItem('msl-theme');
+      if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <style>
     :root {
       --bg: #f4f6fb;
@@ -105,6 +116,11 @@
     .node { cursor: default; }
     .node:hover .node-bg { stroke: #9aa8c4; }
     .node-bg { fill: #fff; stroke: #dfe3e8; stroke-width: 1.5; }
+    .node-head-src { fill: #b26a00; }
+    .node-head-query { fill: #2f9c9c; }
+    .node-head-logic { fill: #7a5af8; }
+    .node-head-sink { fill: #c14b3d; }
+    .node-head-other { fill: #8a919c; }
     .node-head-text { font-size: 11px; fill: #fff; font-weight: 600; }
     .node-title { font-size: 13px; fill: #1f2328; font-weight: 600; }
     .node-sub { font-size: 11px; fill: #6b7280; }
@@ -181,6 +197,50 @@
       .sim-grid, .edit-grid, .ai-grid { grid-template-columns: 1fr; }
       .badge { display: none; }
     }
+
+    /* 深色主题 */
+    :root[data-theme="dark"] {
+      --bg: #0e1218;
+      --panel: #161c26;
+      --ink: #dbe2ee;
+      --ink-2: #9aa6b8;
+      --ink-3: #66748a;
+      --line: #2a3342;
+      --brand: #4d84f0;
+      --brand-2: #8d70ff;
+      --brand-soft: #1a2440;
+      --danger: #ff8a7a;
+      --danger-soft: #33211f;
+      --warn: #d9a441;
+      --ok: #52c98a;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, .5);
+    }
+    :root[data-theme="dark"] header { background: linear-gradient(180deg, #161c26, #12161f); }
+    :root[data-theme="dark"] pre { background: #10151f; }
+    :root[data-theme="dark"] th { background: #1b222e; }
+    :root[data-theme="dark"] tbody tr:hover { background: #1b222e; }
+    :root[data-theme="dark"] .sim-panel { background: #12171f; }
+    :root[data-theme="dark"] .sim-panel button, :root[data-theme="dark"] .edit-side button, :root[data-theme="dark"] .ai-grid button { background: #1b222e; color: var(--ink); }
+    :root[data-theme="dark"] .sim-panel button:hover, :root[data-theme="dark"] .edit-side button:hover, :root[data-theme="dark"] .ai-grid button:hover { background: var(--brand-soft); }
+    :root[data-theme="dark"] #edit-json, :root[data-theme="dark"] .ai-grid input, :root[data-theme="dark"] .ai-grid textarea, :root[data-theme="dark"] .edit-side select { background: #10151f; color: var(--ink); }
+    :root[data-theme="dark"] svg { background-image: radial-gradient(circle, #232c3b 1px, transparent 1px); }
+    :root[data-theme="dark"] .node-bg { fill: #161c26; stroke: #2f3a4c; }
+    :root[data-theme="dark"] .node:hover .node-bg { stroke: #51617a; }
+    :root[data-theme="dark"] .node-title { fill: #dbe2ee; }
+    :root[data-theme="dark"] .node-sub { fill: #8fa0b5; }
+    :root[data-theme="dark"] .node-head-src { fill: #8a5a00; }
+    :root[data-theme="dark"] .node-head-query { fill: #1f6e6e; }
+    :root[data-theme="dark"] .node-head-logic { fill: #5840c4; }
+    :root[data-theme="dark"] .node-head-sink { fill: #96372c; }
+    :root[data-theme="dark"] .node-head-other { fill: #5c6675; }
+    #theme-toggle {
+      margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); background: var(--panel); color: var(--ink-2);
+      border-radius: 999px; padding: 6px 12px; font-size: 12.5px;
+    }
+    #theme-toggle:hover { color: var(--brand); border-color: var(--brand); }
+    .badge + #theme-toggle { margin-left: 10px; }
   </style>
 </head>
 <body>
@@ -192,6 +252,7 @@
         <p>米家自动化极客版场景备份(.bak)· 解读 · 模拟 · 编辑 · AI 生成</p>
       </div>
       <span class="badge">纯本地处理 · 文件不上传</span>
+      <button id="theme-toggle">🌙</button>
     </div>
   </header>
   <main>
@@ -257,5 +318,25 @@
     <a href="https://github.com/lirenjie95/mihome-scene-lab">GitHub 仓库</a>
   </footer>
   <script type="module" src="src/app.js"></script>
+  <script>
+    (function () {
+      var btn = document.getElementById('theme-toggle');
+      var apply = function () {
+        var cur = document.documentElement.getAttribute('data-theme');
+        btn.textContent = cur === 'dark' ? '🌙' : '☀️';
+      };
+      btn.addEventListener('click', function () {
+        var cur = document.documentElement.getAttribute('data-theme');
+        var next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('msl-theme', next);
+        apply();
+      });
+      apply();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      }
+    })();
+  </script>
 </body>
 </html>
