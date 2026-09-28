@@ -57,6 +57,14 @@ export const ASSUMPTIONS = [
     choices: ['by-eiid'],
   },
   {
+    id: 'logic-true-edge',
+    label: '状态卡真值边沿输出',
+    detail: 'logic*/varChange/属性模式 deviceInput 状态由假变真时才向动作类下游发事件,变假仅更新状态',
+    evidence: '基于米家自动化"条件满足才执行"的通用行为推断,未经实机验证',
+    defaultChoice: 'rise-only',
+    choices: ['rise-only', 'every-change'],
+  },
+  {
     id: 'register-persist',
     label: 'register 初始状态',
     detail: 'register 静态初值按 false 建模(重启后持久性未知)',

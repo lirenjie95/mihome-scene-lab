@@ -194,4 +194,98 @@ export const tests = [
       if (eng.getDevice('d1', 2, 1) !== 1) throw new Error('变量=1 应走 output');
     },
   },
+  {
+    name: 'deviceGet 支持 between:区间内走 output,区间外走 output2',
+    fn() {
+      const mk2 = () => mk([
+        node('g', 'deviceGet', {
+          props: { did: 'd1', siid: 3, piid: 1001, dtype: 'float', operator: 'between', v1: 24, v2: 28 },
+          outputs: { output: ['in.input'], output2: ['out.input'] },
+        }),
+        node('in', 'deviceOutput', { props: { did: 'd9', siid: 2, piid: 1, value: 1 } }),
+        node('out', 'deviceOutput', { props: { did: 'd9', siid: 2, piid: 2, value: 1 } }),
+      ]);
+      const a = mk2();
+      a.setDevice('d1', 3, 1001, 26);
+      a.inject('external', 'g', 'input');
+      if (a.getDevice('d9', 2, 1) !== 1) throw new Error('26 在区间内应走 output');
+      const b = mk2();
+      b.setDevice('d1', 3, 1001, 30);
+      b.inject('external', 'g', 'input');
+      if (b.getDevice('d9', 2, 2) !== 1) throw new Error('30 在区间外应走 output2');
+    },
+  },
+  {
+    name: 'deviceGet 支持 include 枚举:命中走 output,未命中走 output2',
+    fn() {
+      const mk2 = () => mk([
+        node('g', 'deviceGet', {
+          props: { did: 'd1', siid: 3, piid: 1001, dtype: 'int', operator: 'include', v1: [1, 2, 3] },
+          outputs: { output: ['in.input'], output2: ['out.input'] },
+        }),
+        node('in', 'deviceOutput', { props: { did: 'd9', siid: 2, piid: 1, value: 1 } }),
+        node('out', 'deviceOutput', { props: { did: 'd9', siid: 2, piid: 2, value: 1 } }),
+      ]);
+      const a = mk2();
+      a.setDevice('d1', 3, 1001, 2);
+      a.inject('external', 'g', 'input');
+      if (a.getDevice('d9', 2, 1) !== 1) throw new Error('枚举命中应走 output');
+      const b = mk2();
+      b.setDevice('d1', 3, 1001, 9);
+      b.inject('external', 'g', 'input');
+      if (b.getDevice('d9', 2, 2) !== 1) throw new Error('枚举未命中应走 output2');
+    },
+  },
+  {
+    name: 'logicAnd 按 canonical input0/input1 引脚求值,全真才输出',
+    fn() {
+      const eng = mk([
+        node('pa', 'deviceInput', {
+          props: { did: 'd1', siid: 2, piid: 1, operator: '=', v1: true },
+          outputs: { output: ['lg.input0'] },
+        }),
+        node('pb', 'deviceInput', {
+          props: { did: 'd2', siid: 2, piid: 1, operator: '=', v1: true },
+          outputs: { output: ['lg.input1'] },
+        }),
+        node('lg', 'logicAnd', { inputs: { input0: null, input1: null }, outputs: { output: ['a.trigger'] } }),
+        node('a', 'deviceOutput', { props: { did: 'd9', siid: 2, piid: 1, value: 1 } }),
+      ]);
+      eng.setDevice('d1', 2, 1, true);
+      if (eng.getDevice('d9', 2, 1) !== undefined) throw new Error('只真一路不应输出');
+      eng.setDevice('d2', 2, 1, true);
+      if (eng.getDevice('d9', 2, 1) !== 1) throw new Error('两路全真应输出');
+    },
+  },
+  {
+    name: 'varSetNumber 拼接变量与常量表达式',
+    fn() {
+      const eng = mk([
+        node('sv', 'varSetNumber', {
+          props: {
+            scope: 'R1', id: 'V2',
+            elements: [{ type: 'var', scope: 'R1', id: 'V1' }, { type: 'const', value: ' + 1' }],
+          },
+          outputs: { output: [] },
+        }),
+      ]);
+      eng.setVar('R1', 'V1', 5);
+      eng.inject('external', 'sv', 'input');
+      if (eng.getVar('R1', 'V2') !== 6) throw new Error(`表达式结果应为 6,得到 ${eng.getVar('R1', 'V2')}`);
+    },
+  },
+  {
+    name: 'deviceOutput 支持变量引用:写当前变量值到设备',
+    fn() {
+      const eng = mk([
+        node('a', 'deviceOutput', {
+          props: { did: 'd1', siid: 2, piid: 1, scope: 'R1', id: 'V1', dtype: 'number' },
+          outputs: { output: [] },
+        }),
+      ]);
+      eng.setVar('R1', 'V1', 3);
+      eng.inject('external', 'a', 'trigger');
+      if (eng.getDevice('d1', 2, 1) !== 3) throw new Error(`设备值应为 3,得到 ${eng.getDevice('d1', 2, 1)}`);
+    },
+  },
 ];

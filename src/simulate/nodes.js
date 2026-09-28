@@ -1,16 +1,56 @@
 import { getChoice } from './assumptions.js';
 
-const cmp = (a, op, b) => {
+const cmp = (a, op, v1, v2) => {
   switch (op) {
-    case '=': return a === b;
-    case '>': return a > b;
-    case '<': return a < b;
-    case '>=': return a >= b;
-    case '<=': return a <= b;
-    case '!=': return a !== b;
+    case '=': return a === v1;
+    case '>': return a > v1;
+    case '<': return a < v1;
+    case '>=': return a >= v1;
+    case '<=': return a <= v1;
+    case '!=': return a !== v1;
+    case 'between': return a >= v1 && a <= v2;
+    case 'include': return Array.isArray(v1) && v1.includes(a);
     default: return false;
   }
 };
+
+// 数值表达式求值(四则与括号):canonical varSetNumber 对拼接文本运行数值解析器。
+// 函数等扩展 DSL 未实现,超出部分结果为 NaN(见 assumptions 的说明思路)。
+function evalExpr(s) {
+  const tokens = String(s).match(/\d+(\.\d+)?|[+\-*/()]/g) ?? [];
+  let i = 0;
+  const peek = () => tokens[i];
+  const parseExpr = () => {
+    let v = parseTerm();
+    while (peek() === '+' || peek() === '-') {
+      const op = tokens[i++];
+      const r = parseTerm();
+      v = op === '+' ? v + r : v - r;
+    }
+    return v;
+  };
+  const parseTerm = () => {
+    let v = parseFactor();
+    while (peek() === '*' || peek() === '/') {
+      const op = tokens[i++];
+      const r = parseFactor();
+      v = op === '*' ? v * r : v / r;
+    }
+    return v;
+  };
+  const parseFactor = () => {
+    if (peek() === '(') {
+      i += 1;
+      const v = parseExpr();
+      i += 1; // ')'
+      return v;
+    }
+    const t = tokens[i++];
+    return t === undefined ? NaN : Number(t);
+  };
+  const v = parseExpr();
+  return i === tokens.length ? v : NaN;
+}
 
 // 事件向某个输出引脚发射:沿 outputs[pin] 端点派发到下游节点输入
 export function fire(eng, node, pin, text) {
@@ -44,11 +84,11 @@ export function evalState(eng, node) {
     case 'deviceInput': {
       if (p.eiid !== undefined) return false;
       const v = eng.getDevice(p.did, p.siid, p.piid);
-      return cmp(v, p.operator ?? '=', p.v1);
+      return cmp(v, p.operator ?? '=', p.v1, p.v2);
     }
     case 'varChange': {
       const v = eng.getVar(p.scope ?? 'global', p.id);
-      return cmp(v, p.operator ?? '=', p.v1);
+      return cmp(v, p.operator ?? '=', p.v1, p.v2);
     }
     case 'timeRange': {
       return Boolean(eng.memOf(node.id, 'inRange', () => false));
@@ -73,10 +113,18 @@ export function evalState(eng, node) {
   }
 }
 
+// 目标输入引脚匹配:基础引脚名 + 动态 input0..N 引脚(logicAnd/Or 等)
+function pinMatches(targetId, endpoint, pin) {
+  const toPin = endpoint.slice(targetId.length + 1);
+  if (toPin === pin) return true;
+  if (pin === 'input' && /^input\d+$/.test(toPin)) return true;
+  return false;
+}
+
 function findSource(eng, targetId, pin) {
   for (const n of eng.nodes) {
     for (const targets of Object.values(n.outputs ?? {})) {
-      if ((targets ?? []).includes(`${targetId}.${pin}`)) return n;
+      if ((targets ?? []).some((t) => pinMatches(targetId, t, pin))) return n;
     }
   }
   return null;
@@ -86,7 +134,7 @@ function findSources(eng, targetId, pin) {
   const out = [];
   for (const n of eng.nodes) {
     for (const targets of Object.values(n.outputs ?? {})) {
-      if ((targets ?? []).includes(`${targetId}.${pin}`)) out.push(n);
+      if ((targets ?? []).some((t) => pinMatches(targetId, t, pin))) out.push(n);
     }
   }
   return out;
@@ -107,7 +155,7 @@ export function processNode(eng, node, event) {
     case 'deviceGet': {
       const p = node.props ?? {};
       const v = eng.getDevice(p.did, p.siid, p.piid);
-      const ok = cmp(v, p.operator ?? '=', p.v1);
+      const ok = cmp(v, p.operator ?? '=', p.v1, p.v2);
       const pin = ok ? 'output' : 'output2';
       eng.logLine('query', node.id, `查询 ${p.did} siid=${p.siid} piid=${p.piid} = ${JSON.stringify(v)},${ok ? '满足' : '不满足'}`);
       return { fired: fire(eng, node, pin, ok ? '满足' : '不满足') };
@@ -115,7 +163,7 @@ export function processNode(eng, node, event) {
     case 'varGet': {
       const p = node.props ?? {};
       const v = eng.getVar(p.scope ?? 'global', p.id);
-      const ok = cmp(v, p.operator ?? '=', p.v1);
+      const ok = cmp(v, p.operator ?? '=', p.v1, p.v2);
       const pin = ok ? 'output' : 'output2';
       eng.logLine('query', node.id, `查询变量 ${p.id} = ${JSON.stringify(v)},${ok ? '满足' : '不满足'}`);
       return { fired: fire(eng, node, pin, ok ? '满足' : '不满足') };
@@ -226,12 +274,13 @@ export function processNode(eng, node, event) {
     case 'deviceOutput': {
       const p = node.props ?? {};
       if (Array.isArray(p.ins) && p.ins.length > 0) {
-        const text = `执行: ${p.ins.map((i) => i.value ?? JSON.stringify(i)).join('; ')}`;
+        const text = `执行: ${p.ins.map((i) => i.value ?? (i.scope && i.id ? eng.getVar(i.scope, i.id) : undefined) ?? JSON.stringify(i)).join('; ')}`;
         eng.logLine('action', node.id, text);
         return { fired: fire(eng, node, 'output', '已执行'), actions: [{ nodeId: node.id, text }] };
       }
-      eng.setDevice(p.did, p.siid, p.piid, p.value);
-      const a = { nodeId: node.id, text: `执行: 设备 ${p.did} siid=${p.siid} piid=${p.piid} ← ${JSON.stringify(p.value)}` };
+      const value = p.value !== undefined ? p.value : (p.scope && p.id ? eng.getVar(p.scope, p.id) : undefined);
+      eng.setDevice(p.did, p.siid, p.piid, value);
+      const a = { nodeId: node.id, text: `执行: 设备 ${p.did} siid=${p.siid} piid=${p.piid} ← ${JSON.stringify(value)}` };
       eng.logLine('action', node.id, a.text);
       return { fired: fire(eng, node, 'output', '已执行'), actions: [a] };
     }
@@ -244,12 +293,13 @@ export function processNode(eng, node, event) {
     case 'varSetNumber':
     case 'varSetString': {
       const p = node.props ?? {};
-      let v;
-      if (p.elements?.[0]?.type === 'const') {
-        v = node.type === 'varSetNumber' ? Number(p.elements[0].value) : p.elements[0].value;
-      } else {
-        v = p.value;
+      const parts = [];
+      for (const el of p.elements ?? []) {
+        if (el?.type === 'var') parts.push(String(eng.getVar(el.scope ?? 'global', el.id) ?? ''));
+        else if (el?.type === 'const') parts.push(String(el.value ?? ''));
       }
+      const text = parts.join('');
+      const v = node.type === 'varSetNumber' ? evalExpr(text) : text;
       eng.setVar(p.scope ?? 'global', p.id, v);
       return { fired: fire(eng, node, 'output', `变量 ← ${JSON.stringify(v)}`) };
     }
@@ -270,18 +320,22 @@ export function processNode(eng, node, event) {
   }
 }
 
+// 状态卡输出:状态变化时记录,按假设决定是否向动作下游发事件(默认真值上升沿)
+function stateOutput(eng, node, v, label) {
+  const prev = eng.memOf(node.id, 'prev', () => null);
+  if (prev === v) return;
+  eng.mem.get(node.id).set('prev', v);
+  eng.logLine('state', node.id, `${label} → ${v}`);
+  const rise = getChoice('logic-true-edge') === 'rise-only' ? v === true : true;
+  if (rise) fire(eng, node, 'output', `状态 → ${v}`);
+}
+
 export function onState(eng, node) {
   switch (node.type) {
     case 'logicAnd':
     case 'logicOr':
     case 'logicNot': {
-      const v = evalState(eng, node);
-      const prev = eng.memOf(node.id, 'prev', () => null);
-      if (prev !== v) {
-        eng.mem.get(node.id).set('prev', v);
-        eng.logLine('state', node.id, `${node.type} 求值 → ${v}`);
-        fire(eng, node, 'output', `状态 → ${v}`);
-      }
+      stateOutput(eng, node, evalState(eng, node), node.type);
       return;
     }
     case 'statusLast': {
@@ -301,24 +355,12 @@ export function onState(eng, node) {
       return;
     }
     case 'varChange': {
-      const v = evalState(eng, node);
-      const prev = eng.memOf(node.id, 'prev', () => null);
-      if (prev !== v) {
-        eng.mem.get(node.id).set('prev', v);
-        eng.logLine('state', node.id, `varChange 状态 → ${v}`);
-        fire(eng, node, 'output', `状态 → ${v}`);
-      }
+      stateOutput(eng, node, evalState(eng, node), 'varChange 状态');
       return;
     }
     case 'deviceInput': {
       if ((node.props ?? {}).eiid === undefined) {
-        const v = evalState(eng, node);
-        const prev = eng.memOf(node.id, 'prev', () => null);
-        if (prev !== v) {
-          eng.mem.get(node.id).set('prev', v);
-          eng.logLine('state', node.id, `属性模式状态 → ${v}`);
-          fire(eng, node, 'output', `状态 → ${v}`);
-        }
+        stateOutput(eng, node, evalState(eng, node), '属性模式状态');
       }
       return;
     }
