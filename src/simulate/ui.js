@@ -84,8 +84,18 @@ export function setupSimUI(payload) {
       .join('');
 
     const triggerButtons = (rule.nodes ?? [])
-      .filter((n) => SOURCE_TYPES.has(n.type))
-      .map((n) => `<button data-trigger="${escapeHtml(n.id)}">触发 ${escapeHtml(n.type)} ${escapeHtml(n.id.slice(0, 8))}</button>`)
+      .flatMap((n) => {
+        if (n.type === 'timeRange') {
+          return [
+            `<button data-timerange="${escapeHtml(n.id)}" data-in="1">进入时间窗 ${escapeHtml(n.id.slice(0, 8))}</button>`,
+            `<button data-timerange="${escapeHtml(n.id)}" data-in="0">离开时间窗 ${escapeHtml(n.id.slice(0, 8))}</button>`,
+          ];
+        }
+        if (SOURCE_TYPES.has(n.type)) {
+          return [`<button data-trigger="${escapeHtml(n.id)}">触发 ${escapeHtml(n.type)} ${escapeHtml(n.id.slice(0, 8))}</button>`];
+        }
+        return [];
+      })
       .join(' ');
 
     const assumptionRows = ASSUMPTIONS.map((a) => `
@@ -161,6 +171,15 @@ export function setupSimUI(payload) {
           step.fired.forEach((f) => firedIds.add(f.nodeId));
         }
         refreshSvg([...firedIds]);
+        refreshTime();
+      } else if (t.dataset.timerange) {
+        const before = eng.trace.length;
+        eng.setTimeRange(t.dataset.timerange, t.dataset.in === '1');
+        const firedIds = new Set();
+        for (const step of eng.trace.slice(before)) {
+          step.fired.forEach((f) => firedIds.add(f.nodeId));
+        }
+        if (firedIds.size) refreshSvg([...firedIds]);
         refreshTime();
       } else if (t.dataset.adv) {
         const ms = Number(t.dataset.adv);
